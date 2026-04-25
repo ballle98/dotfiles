@@ -1,0 +1,328 @@
+{
+	"folders": [
+		{
+	    	"name": "addons-ddwrt",
+			"path": "../../../openhab-addons/bundles/org.openhab.binding.ddwrt"
+		},
+		{
+			"name": "distro-app",
+			"path": "../../../openhab-distro/launch/app"
+		}
+	],
+	"settings": {
+		"editor.formatOnType": true,
+		"editor.rulers": [80,120],
+		"java.configuration.updateBuildConfiguration": "automatic",
+		"java.debug.settings.console": "integratedTerminal",
+		"java.format.enabled": true,
+		"java.format.comments.enabled": true,
+		"java.format.onType.enabled": true,
+		"java.import.generatesMetadataFilesAtProjectRoot": false,
+		"java.codeGeneration.generateComments": true,
+		"java.format.settings.url": "https://raw.githubusercontent.com/openhab/static-code-analysis/main/codestyle/src/main/resources/openhab_codestyle.xml",
+		"java.format.settings.profile": "openHAB",
+		"[java]": {
+			"editor.defaultFormatter": "redhat.java",
+			"editor.detectIndentation": false,
+			"editor.tabSize": 4,
+			// "editor.codeActionsOnSave": {
+			//     "source.organizeImports": "explicit"
+			// }
+		},
+		// "[xml]": {
+		//     "editor.defaultFormatter": null
+		// },
+		"maven.terminal.favorites": [
+			{
+				"command": "install",
+				"debug": false
+			}
+		],
+		"git.alwaysSignOff": true,
+		"java.compile.nullAnalysis.mode": "disabled",
+		"terminal.integrated.cwd": "${workspaceFolder:addons-ddwrt}"
+	},
+	"launch": {
+    	"configurations": [
+			{
+				"type": "java",
+				"name": "Attach to openHAB",
+				"request": "attach",
+				"hostName": "localhost",
+				"port": 10001,
+				"preLaunchTask": "Maven app debug"
+			}
+		],
+    	"compounds": []
+  	},
+  	"tasks": {
+    	"version": "2.0.0",
+		"tasks": [
+			{
+				// see https://github.com/openhab/openhab-addons#command-line-build
+				"label": "Maven Install",
+				"type": "shell",
+				"command": "./mvnw",
+				"options": {
+					"cwd": "${workspaceFolder:addons-ddwrt}/../.."
+				},
+				"group": {
+					"kind": "build",
+					"isDefault": true
+				},
+				"args": [
+					"install",
+					"-pl",
+					":org.openhab.binding.ddwrt"
+				],
+				"problemMatcher": [],
+				"detail": "Maven install task"
+			},
+			{
+				"label": "Maven Install kar",
+				"type": "shell",
+				"command": "./mvnw",
+				"options": {
+					"cwd": "${workspaceFolder:addons-ddwrt}/../.."
+				},
+				"group": {
+					"kind": "build"
+				},
+				"args": [
+					"install",
+					"karaf:kar",
+					"-pl",
+					":org.openhab.binding.ddwrt"
+				],
+				"problemMatcher": [],
+				"detail": "Maven install kar task"
+			},
+			{
+				"label": "Maven Install (with updates)",
+				"type": "shell",
+				"command": "./mvnw",
+				"options": {
+					"cwd": "${workspaceFolder:addons-ddwrt}/../.."
+				},
+				"group": {
+					"kind": "build"
+				},
+				"args": [
+					"install",
+					"-U",
+					"-pl",
+					":org.openhab.binding.ddwrt"
+				],
+				"problemMatcher": [],
+				"detail": "Maven install task"
+			},
+			{
+				"label": "Maven clean install",
+				"type": "shell",
+				"command": "./mvnw",
+				"options": {
+					"cwd": "${workspaceFolder:addons-ddwrt}/../.."
+				},
+				"group": {
+					"kind": "build"
+				},
+				"args": [
+					"clean",
+					"install",
+					"-pl",
+					":org.openhab.binding.ddwrt"
+				],
+				"problemMatcher": [],
+				"detail": "Maven clean install task"
+			},
+			{
+				"label": "Maven skip checks install",
+				"type": "shell",
+				"command": "./mvnw",
+				"options": {
+					"cwd": "${workspaceFolder:addons-ddwrt}/../.."
+				},
+				"group": {
+					"kind": "build",
+				},
+				"args": [
+					"-f",
+					"../../pom.xml",
+					"install",
+					"-T1C",
+					"-DskipTests",
+					"-DskipChecks",
+					"-Dspotless.check.skip=true",
+					"-pl",
+					":org.openhab.binding.ddwrt"
+				],
+				"problemMatcher": [],
+				"detail": "Maven skip check install task"
+			},
+			{
+				// see https://www.openhab.org/docs/developer/ide/generic.html#preparation
+				"label": "Maven app resolve",
+				"type": "shell",
+				"command": "${workspaceFolder:distro-app}/../../mvnw",
+				"group": {
+					"kind": "build"
+				},
+				"args": [
+					"-f",
+					"${workspaceFolder:distro-app}/pom.xml",
+					"bnd-resolver:resolve"
+				],
+				"problemMatcher": [],
+				"detail": "Maven app resolve task"
+			},
+			{
+				"label": "Maven app clean run",
+				"type": "shell",
+				"command": "${workspaceFolder:distro-app}/../../mvnw",
+				"group": {
+					"kind": "build"
+				},
+				"args": [
+					"-f",
+					"${workspaceFolder:distro-app}/pom.xml",
+					"clean",
+					"bnd-run:run"
+				],
+				"problemMatcher": [],
+				"detail": "Maven app celan run"
+			},
+			{
+				"label": "Maven app run",
+				"type": "shell",
+				"command": "${workspaceFolder:distro-app}/../../mvnw",
+				"group": {
+					"kind": "build"
+				},
+				"args": [
+					"-f",
+					"${workspaceFolder:distro-app}/pom.xml",
+					"bnd-run:run"
+				],
+				"problemMatcher": [],
+				"detail": "Maven app run task"
+			},
+			{
+				"label": "Maven app debug",
+				"type": "shell",
+				"isBackground": true,
+				"command": "bash",
+				"args": [
+					"-lc",
+					"\"${workspaceFolder:distro-app}/../../mvnw\" -f \"${workspaceFolder:distro-app}/pom.xml\" -D-runjdb=10001 bnd-run:run & " +
+					"pid=$!; " +
+					"until nc -z localhost 10001; do sleep 1; done; " +
+					"echo OPENHAB_DEBUG_READY; " +
+					"wait $pid"
+				],
+				"problemMatcher": {
+					"owner": "openhab",
+					"pattern": {
+						"regexp": "^(.*)$",
+						"message": 1
+					},
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": ".",
+						"endsPattern": "OPENHAB_DEBUG_READY"
+					}
+				},
+				"presentation": {
+					"reveal": "always",
+					"panel": "dedicated"
+				},
+				"detail": "Maven app run debug task"
+			},
+			{
+				"label": "reset userdata",
+				"type": "shell",
+				"command": "rm",
+				"group": {
+					"kind": "build",
+					"isDefault": false
+				},
+				"args": [
+					"-rf",
+					"${workspaceFolder:distro-app}/runtime/userdata/*"
+				],
+				"problemMatcher": [],
+				"detail": "reset userdata"
+			},
+			{
+				"label": "view code analysis report",
+				"type": "shell",
+				"command": "xdg-open",
+				"group": {
+					"kind": "build",
+					"isDefault": false
+				},
+				"args": [
+					"${workspaceFolder:addons-ddwrt}/target/code-analysis/report.html"
+				],
+				"problemMatcher": []
+			},
+			{
+				"label": "mvn Spotless (Fix codestyle)",
+				"type": "shell",
+				"command": "./mvnw",
+				"options": {
+					"cwd": "${workspaceFolder:addons-ddwrt}/../.."
+				},
+				"group": {
+					"kind": "build"
+				},
+				"args": [
+					"spotless:apply",
+					"-pl",
+					":org.openhab.binding.ddwrt"
+				],
+				"problemMatcher": []
+			},
+			{
+				"label": "Maven CI Verify",
+				"type": "shell",
+				"command": "./mvnw",
+				"options": {
+					"cwd": "${workspaceFolder:addons-ddwrt}/../.."
+				},
+				"group": {
+					"kind": "build"
+				},
+				"args": [
+					"clean",
+					"verify",
+					"-B",
+					"-T",
+					"1.5C",
+					"-U",
+					"-am",
+					"-amd",
+					"-pl",
+					":org.openhab.binding.ddwrt,:org.openhab.addons.bom.openhab-core-index,:org.openhab.addons.bom.runtime-index,:org.openhab.addons.bom.test-index,-:org.openhab.addons.reactor.features.karaf,-:org.openhab.addons.features.karaf.openhab-addons,-:org.openhab.addons.features.karaf.openhab-addons-external"
+				],
+				"problemMatcher": [],
+				"detail": "CI-like clean verify build for ddwrt binding from openhab-addons root"
+			},
+			{
+				"label": "Full github CI Build",
+				"type": "shell",
+				"command": "bash",
+				"options": {
+					"cwd": "${workspaceFolder:addons-ddwrt}/../.."
+				},
+				"group": {
+					"kind": "build"
+				},
+				"args": [
+					"./.github/scripts/maven-build"
+				],
+				"problemMatcher": [],
+				"detail": "full CI build"
+			}
+		]
+  	}
+}
