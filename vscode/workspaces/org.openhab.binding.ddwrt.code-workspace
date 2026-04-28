@@ -322,7 +322,18 @@
 				],
 				"problemMatcher": [],
 				"detail": "full CI build"
+			},
+			{
+				"label": "Export full git diff with timestamp",
+				"type": "shell",
+				"command": "bash",
+				"args": [
+					"-lc",
+					"ts=$(date +%m-%d-%y_%H-%M-%S); git diff \"$(git merge-base main HEAD)\" > \"full-diff-${ts}.txt\""
+				],
+				"problemMatcher": []
 			}
+
 		]
   	}
 }
