@@ -91,6 +91,8 @@
 				"args": [
 					"install",
 					"karaf:kar",
+					"-DskipTests",
+					"-DskipChecks",
 					"-pl",
 					":org.openhab.binding.ddwrt"
 				],
@@ -98,7 +100,7 @@
 				"detail": "Maven install kar task"
 			},
 			{
-				"label": "Maven Install (with updates)",
+				"label": "Maven clean install (with updates)",
 				"type": "shell",
 				"command": "./mvnw",
 				"options": {
@@ -108,6 +110,7 @@
 					"kind": "build"
 				},
 				"args": [
+					"clean",
 					"install",
 					"-U",
 					"-pl",
