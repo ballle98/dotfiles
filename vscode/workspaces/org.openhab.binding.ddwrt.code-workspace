@@ -72,6 +72,8 @@
 				},
 				"args": [
 					"install",
+					"-fae",
+					"-Dmaven.compiler.failOnError=false",
 					"-pl",
 					":org.openhab.binding.ddwrt"
 				],
@@ -132,6 +134,8 @@
 				"args": [
 					"clean",
 					"install",
+					"-fae",
+					"-Dmaven.compiler.failOnError=false",
 					"-pl",
 					":org.openhab.binding.ddwrt"
 				],
@@ -332,10 +336,20 @@
 				"command": "bash",
 				"args": [
 					"-lc",
-					"ts=$(date +%m-%d-%y_%H-%M-%S); git diff \"$(git merge-base main HEAD)\" > \"full-diff-${ts}.txt\""
+					"ts=$(date +%m-%d-%y_%H-%M-%S); git diff \"$(git merge-base @{u} HEAD)\" > \"full-diff-${ts}.txt\""
+				],
+				"problemMatcher": []
+			},
+			{
+				"label": "Version timestamp",
+				"type": "shell",
+				"command": "date",
+				"args": [
+					"+%Y%m%d%H%M"
 				],
 				"problemMatcher": []
 			}
+
 
 		]
   	}
