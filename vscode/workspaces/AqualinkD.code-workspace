@@ -1,0 +1,174 @@
+{
+  "folders": [
+    {
+      "name": "AqualinkD",
+      "path": "../../../AqualinkD"
+    }
+  ],
+
+  "settings": {
+    // ------------------------------------------------------------
+    // C/C++ IntelliSense settings for Raspberry Pi OS arm64 target
+    // ------------------------------------------------------------
+    //
+    // These settings affect VS Code IntelliSense only.
+    // The actual build is controlled by the tasks below.
+
+    "C_Cpp.default.compilerPath": "/usr/bin/aarch64-linux-gnu-gcc",
+
+    "C_Cpp.default.compilerArgs": [
+      "--sysroot",
+      "${env:HOME}/sysroots/pi-arm64"
+    ],
+
+    "C_Cpp.default.intelliSenseMode": "linux-gcc-arm64",
+
+    "C_Cpp.default.includePath": [
+      "${workspaceFolder:AqualinkD}/**",
+      "${env:HOME}/sysroots/pi-arm64/usr/include",
+      "${env:HOME}/sysroots/pi-arm64/usr/include/aarch64-linux-gnu"
+    ],
+
+    "C_Cpp.default.defines": [
+      "AQ_PDA",
+      "AQ_ONETOUCH",
+      "AQ_IAQTOUCH",
+      "AQ_RS16",
+      "AQ_MANAGER",
+      "MG_ENABLE_HTTP_SSI=0",
+      "MG_ENABLE_DIRECTORY_LISTING=0",
+      "MG_ENABLE_HTTP_CGI=0"
+    ],
+
+    "C_Cpp.default.cStandard": "gnu17",
+    "C_Cpp.default.cppStandard": "gnu++17",
+
+    // Optional but helpful when switching configs or after sysroot updates.
+    "C_Cpp.errorSquiggles": "enabled"
+  },
+
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "AqualinkD: make arm64",
+        "type": "process",
+        "command": "make",
+        "args": [
+          "arm64",
+          "CC_ARM64=aarch64-linux-gnu-gcc --sysroot=${env:HOME}/sysroots/pi-arm64",
+          "LIBS=-L${env:HOME}/sysroots/pi-arm64/usr/lib/aarch64-linux-gnu -Wl,-rpath-link,${env:HOME}/sysroots/pi-arm64/usr/lib/aarch64-linux-gnu -lpthread -lm -lrt -lsystemd"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:AqualinkD}"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": [
+          "$gcc"
+        ]
+      },
+
+      {
+        "label": "AqualinkD: make clean",
+        "type": "process",
+        "command": "make",
+        "args": [
+          "clean"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:AqualinkD}"
+        },
+        "problemMatcher": []
+      },
+
+      {
+        "label": "AqualinkD: make clean then arm64",
+        "type": "shell",
+        "command": "make clean && make arm64 CC_ARM64=\"aarch64-linux-gnu-gcc --sysroot=${env:HOME}/sysroots/pi-arm64\" LIBS=\"-L${env:HOME}/sysroots/pi-arm64/usr/lib/aarch64-linux-gnu -Wl,-rpath-link,${env:HOME}/sysroots/pi-arm64/usr/lib/aarch64-linux-gnu -lpthread -lm -lrt -lsystemd\"",
+        "options": {
+          "cwd": "${workspaceFolder:AqualinkD}"
+        },
+        "problemMatcher": [
+          "$gcc"
+        ]
+      },
+
+      {
+        "label": "AqualinkD: inspect arm64 binary",
+        "type": "process",
+        "command": "bash",
+        "args": [
+          "-lc",
+          "file release/aqualinkd-arm64 && aarch64-linux-gnu-readelf -l release/aqualinkd-arm64 | grep interpreter && aarch64-linux-gnu-readelf -d release/aqualinkd-arm64 | grep NEEDED"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:AqualinkD}"
+        },
+        "problemMatcher": []
+      },
+
+      {
+        "label": "AqualinkD: deploy arm64 to Pi /tmp",
+        "type": "process",
+        "command": "bash",
+        "args": [
+          "-lc",
+          "scp release/aqualinkd-arm64 pi@pi:/tmp/aqualinkd && ssh pi@pi 'chmod +x /tmp/aqualinkd && file /tmp/aqualinkd && ldd /tmp/aqualinkd'"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:AqualinkD}"
+        },
+        "dependsOn": [
+          "AqualinkD: make arm64"
+        ],
+        "problemMatcher": []
+      },
+
+      {
+        "label": "AqualinkD: deploy & run debug on Pi",
+        "type": "process",
+        "command": "bash",
+        "args": [
+          "-lc",
+          "scp release/aqualinkd-arm64 pi@pi:/tmp/aqualinkd && ssh -t pi@pi 'chmod +x /tmp/aqualinkd && sudo systemctl stop aqualinkd && sudo /tmp/aqualinkd -d -v -c /etc/aqualinkd.conf 2>&1 | tee /tmp/aqualinkd-debug.log; sleep 2 && sudo systemctl start aqualinkd'"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:AqualinkD}"
+        },
+        "dependsOn": [
+          "AqualinkD: make arm64"
+        ],
+        "isBackground": true,
+        "problemMatcher": []
+      },
+
+      {
+        "label": "AqualinkD: restart Pi service (cleanup)",
+        "type": "process",
+        "command": "bash",
+        "args": [
+          "-lc",
+          "ssh pi@pi 'sudo systemctl start aqualinkd && sudo systemctl status aqualinkd --no-pager'"
+        ],
+        "problemMatcher": []
+      },
+
+      {
+        "label": "AqualinkD: sync Pi sysroot",
+        "type": "process",
+        "command": "${env:HOME}/sync-pi-sysroot.sh",
+        "args": [
+          "pi@pi",
+          "${env:HOME}/sysroots/pi-arm64"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:AqualinkD}"
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+}
