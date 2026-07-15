@@ -155,7 +155,7 @@
         "command": "bash",
         "args": [
           "-lc",
-          "ssh pi@pi 'sudo systemctl start aqualinkd && sudo systemctl status aqualinkd --no-pager'"
+          "ssh pi@pi 'sudo killall -9 aqualinkd; sudo systemctl start aqualinkd && sudo systemctl status aqualinkd --no-pager'"
         ],
         "problemMatcher": []
       },
