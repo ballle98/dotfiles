@@ -5,7 +5,14 @@
       "path": "../../../AqualinkD"
     },
     {
+      "name": "aqualinkd-validator",
+      "path": "../../../aqualinkd-validator"
+    },
+    {
       "path": "../../../AqualinkD.wiki"
+    },
+    {
+      "path": "../../../../mnt/pi-tmp"
     }
   ],
 
@@ -117,10 +124,10 @@
       {
         "label": "AqualinkD: deploy arm64 to Pi /tmp",
         "type": "process",
-        "command": "bash",
+        "command": "${env:HOME}/git/dotfiles/bin/deploy-aqualinkd-pi.sh",
         "args": [
-          "-lc",
-          "scp release/aqualinkd-arm64 pi@pi:/tmp/aqualinkd && ssh pi@pi 'chmod +x /tmp/aqualinkd && file /tmp/aqualinkd && ldd /tmp/aqualinkd'"
+          "pi@pi",
+          "${workspaceFolder:AqualinkD}"
         ],
         "options": {
           "cwd": "${workspaceFolder:AqualinkD}"
@@ -137,13 +144,13 @@
         "command": "bash",
         "args": [
           "-lc",
-          "scp release/aqualinkd-arm64 pi@pi:/tmp/aqualinkd && ssh -t pi@pi 'chmod +x /tmp/aqualinkd && sudo systemctl stop aqualinkd && sudo /tmp/aqualinkd -d -v -c /etc/aqualinkd.conf 2>&1 | tee /tmp/aqualinkd-debug.log; sleep 2 && sudo systemctl start aqualinkd'"
+          "ssh -t pi@pi 'restore_service() { trap - EXIT HUP INT TERM; sleep 2; sudo systemctl start aqualinkd; }; trap restore_service EXIT HUP INT TERM; sudo systemctl stop aqualinkd; sudo /tmp/aqualinkd -d -v -c /tmp/aqualinkd.conf 2>&1 | tee /tmp/aqualinkd-debug-$(date +%Y%m%d-%H%M%S).log'"
         ],
         "options": {
           "cwd": "${workspaceFolder:AqualinkD}"
         },
         "dependsOn": [
-          "AqualinkD: make arm64"
+          "AqualinkD: deploy arm64 to Pi /tmp"
         ],
         "isBackground": true,
         "problemMatcher": []
@@ -155,7 +162,7 @@
         "command": "bash",
         "args": [
           "-lc",
-          "ssh pi@pi 'sudo killall -9 aqualinkd; sudo systemctl start aqualinkd && sudo systemctl status aqualinkd --no-pager'"
+          "ssh -t pi@pi 'sudo systemctl stop aqualinkd; sudo pkill -TERM -x aqualinkd || true; sleep 2; sudo systemctl start aqualinkd && sudo systemctl status aqualinkd --no-pager'"
         ],
         "problemMatcher": []
       },
@@ -163,7 +170,7 @@
       {
         "label": "AqualinkD: sync Pi sysroot",
         "type": "process",
-        "command": "${env:HOME}/sync-pi-sysroot.sh",
+        "command": "${env:HOME}/git/dotfiles/bin/sync-pi-sysroot.sh",
         "args": [
           "pi@pi",
           "${env:HOME}/sysroots/pi-arm64"
@@ -172,6 +179,39 @@
           "cwd": "${workspaceFolder:AqualinkD}"
         },
         "problemMatcher": []
+      },
+
+      {
+        "label": "AqualinkD + Validator: containerized live-panel test on Pi",
+        "type": "process",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi.sh",
+        "args": [
+          "pi@pi",
+          "${workspaceFolder:AqualinkD}",
+          "${workspaceFolder:aqualinkd-validator}",
+          "${input:aqualinkdValidatorDuration}"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:aqualinkd-validator}"
+        },
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "AqualinkD: deploy arm64 to Pi /tmp"
+        ],
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated",
+          "clear": true
+        }
+      }
+    ],
+    "inputs": [
+      {
+        "id": "aqualinkdValidatorDuration",
+        "type": "promptString",
+        "description": "Live-panel validation duration in seconds",
+        "default": "600"
       }
     ]
   }
