@@ -1,0 +1,17 @@
+[Unit]
+Description=Mount the Pi /tmp directory with rclone
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStartPre=-/usr/bin/fusermount3 -uz %h/mnt/pi-tmp
+ExecStartPre=/usr/bin/mkdir -p %h/mnt/pi-tmp %h/.cache/rclone
+ExecStartPre=/bin/sh -c 'test -e /dev/fuse || sudo -n /usr/bin/mknod -m 666 /dev/fuse c 10 229'
+ExecStart=/usr/bin/rclone mount pi:/tmp %h/mnt/pi-tmp --config=%h/.config/rclone/rclone.conf --cache-dir=%h/.cache/rclone --vfs-cache-mode=writes --vfs-write-back=2s --dir-cache-time=5s --attr-timeout=1s --poll-interval=0
+ExecStop=/usr/bin/fusermount3 -u %h/mnt/pi-tmp
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

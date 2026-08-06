@@ -13,6 +13,9 @@
     },
     {
       "path": "../../../../mnt/pi-tmp"
+    },
+    {
+      "path": "../../../aqualinkd-validator.wiki"
     }
   ],
 
@@ -182,14 +185,15 @@
       },
 
       {
-        "label": "AqualinkD + Validator: containerized live-panel test on Pi",
+        "label": "AqualinkD + Validator: pda-live-fast on staged Pi",
         "type": "process",
         "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi.sh",
         "args": [
           "pi@pi",
           "${workspaceFolder:AqualinkD}",
           "${workspaceFolder:aqualinkd-validator}",
-          "${input:aqualinkdValidatorDuration}"
+          "pda-live-fast",
+          ""
         ],
         "options": {
           "cwd": "${workspaceFolder:aqualinkd-validator}"
@@ -204,14 +208,55 @@
           "panel": "dedicated",
           "clear": true
         }
-      }
-    ],
-    "inputs": [
+      },
+
       {
-        "id": "aqualinkdValidatorDuration",
-        "type": "promptString",
-        "description": "Live-panel validation duration in seconds",
-        "default": "600"
+        "label": "AqualinkD + Validator: pda-live-long on staged Pi",
+        "type": "process",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi.sh",
+        "args": [
+          "pi@pi",
+          "${workspaceFolder:AqualinkD}",
+          "${workspaceFolder:aqualinkd-validator}",
+          "pda-live-long",
+          ""
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:aqualinkd-validator}"
+        },
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "AqualinkD: deploy arm64 to Pi /tmp"
+        ],
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated",
+          "clear": true
+        }
+      },
+
+      {
+        "label": "AqualinkD + Validator: pda-live-fast on installed Pi",
+        "type": "process",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi.sh",
+        "args": [
+          "pi@pi",
+          "${workspaceFolder:AqualinkD}",
+          "${workspaceFolder:aqualinkd-validator}",
+          "pda-live-fast",
+          "",
+          "installed"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:aqualinkd-validator}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated",
+          "clear": true
+        }
       }
     ]
   }

@@ -1,0 +1,29 @@
+#!/bin/bash
+# Convert .docx files to GitHub-Flavored Markdown using pandoc
+
+if [ $# -eq 0 ]; then
+    echo "Usage: docx2md <file.docx> [file2.docx ...]"
+    exit 1
+fi
+
+for file in "$@"; do
+    if [ ! -f "$file" ]; then
+        echo "Error: '$file' not found"
+        continue
+    fi
+
+    if [[ "$file" != *.docx ]]; then
+        echo "Skipping '$file' (not a .docx file)"
+        continue
+    fi
+
+    output="${file%.docx}.md"
+    echo "Converting: $file -> $output"
+    pandoc "$file" --extract-media=./images -t gfm -o "$output"
+
+    if [ $? -eq 0 ]; then
+        echo "  Done."
+    else
+        echo "  Failed."
+    fi
+done

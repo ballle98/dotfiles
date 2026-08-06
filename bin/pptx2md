@@ -1,0 +1,41 @@
+#!/bin/bash
+# Convert .pptx files to GitHub-Flavored Markdown via LibreOffice + pandoc
+
+if [ $# -eq 0 ]; then
+    echo "Usage: pptx2md <file.pptx> [file2.pptx ...]"
+    exit 1
+fi
+
+for file in "$@"; do
+    if [ ! -f "$file" ]; then
+        echo "Error: '$file' not found"
+        continue
+    fi
+
+    if [[ "$file" != *.pptx ]]; then
+        echo "Skipping '$file' (not a .pptx file)"
+        continue
+    fi
+
+    base="${file%.pptx}"
+    docx="${base}.docx"
+    output="${base}.md"
+
+    echo "Converting: $file -> $docx"
+    libreoffice --headless --convert-to docx "$file" > /dev/null 2>&1
+
+    if [ $? -ne 0 ] || [ ! -f "$docx" ]; then
+        echo "  Failed to convert to docx"
+        continue
+    fi
+
+    echo "Converting: $docx -> $output"
+    pandoc "$docx" --extract-media=./images -t gfm -o "$output"
+
+    if [ $? -eq 0 ]; then
+        rm -f "$docx"
+        echo "  Done."
+    else
+        echo "  Failed."
+    fi
+done
