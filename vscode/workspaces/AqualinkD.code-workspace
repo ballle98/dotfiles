@@ -57,7 +57,13 @@
     "C_Cpp.default.cppStandard": "gnu++17",
 
     // Optional but helpful when switching configs or after sysroot updates.
-    "C_Cpp.errorSquiggles": "enabled"
+    "C_Cpp.errorSquiggles": "enabled",
+
+    // pi-tmp is an rclone FUSE mount and does not support inotify watches.
+    "files.watcherExclude": {
+      "/home/lee_ballard/mnt/pi-tmp": true,
+      "/home/lee_ballard/mnt/pi-tmp/**": true
+    }
   },
 
   "tasks": {
@@ -144,10 +150,9 @@
       {
         "label": "AqualinkD: deploy & run debug on Pi",
         "type": "process",
-        "command": "bash",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-debug-pi.sh",
         "args": [
-          "-lc",
-          "ssh -t pi@pi 'restore_service() { trap - EXIT HUP INT TERM; sleep 2; sudo systemctl start aqualinkd; }; trap restore_service EXIT HUP INT TERM; sudo systemctl stop aqualinkd; sudo /tmp/aqualinkd -d -v -c /tmp/aqualinkd.conf 2>&1 | tee /tmp/aqualinkd-debug-$(date +%Y%m%d-%H%M%S).log'"
+          "pi@pi"
         ],
         "options": {
           "cwd": "${workspaceFolder:AqualinkD}"
@@ -219,6 +224,58 @@
           "${workspaceFolder:AqualinkD}",
           "${workspaceFolder:aqualinkd-validator}",
           "pda-live-long",
+          ""
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:aqualinkd-validator}"
+        },
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "AqualinkD: deploy arm64 to Pi /tmp"
+        ],
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated",
+          "clear": true
+        }
+      },
+
+      {
+        "label": "AqualinkD + Validator: pda-live-simulator on staged Pi",
+        "type": "process",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi.sh",
+        "args": [
+          "pi@pi",
+          "${workspaceFolder:AqualinkD}",
+          "${workspaceFolder:aqualinkd-validator}",
+          "pda-live-simulator",
+          ""
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:aqualinkd-validator}"
+        },
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "AqualinkD: deploy arm64 to Pi /tmp"
+        ],
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated",
+          "clear": true
+        }
+      },
+
+      {
+        "label": "AqualinkD + Validator: PDA simulator menu walk on staged Pi",
+        "type": "process",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi.sh",
+        "args": [
+          "pi@pi",
+          "${workspaceFolder:AqualinkD}",
+          "${workspaceFolder:aqualinkd-validator}",
+          "pda-live-simulator-menu-walk",
           ""
         ],
         "options": {

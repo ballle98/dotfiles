@@ -22,9 +22,9 @@ if [ -n "$PDA_TEST_DEVICES" ] &&
 fi
 
 case "$PDA_SUITE" in
-  pda-live-fast|pda-live-long) ;;
+  pda-live-fast|pda-live-long|pda-live-simulator|pda-live-simulator-menu-walk) ;;
   *)
-    echo "ERROR: PDA suite must be pda-live-fast or pda-live-long" >&2
+    echo "ERROR: unsupported Pi PDA suite: $PDA_SUITE" >&2
     exit 1
     ;;
 esac
@@ -90,6 +90,8 @@ fi
 echo "  Suite:     $PDA_SUITE"
 if [ "$PDA_SUITE" = "pda-live-long" ]; then
   echo "  Devices:   ${PDA_TEST_DEVICES:-all discovered switches}"
+elif [[ "$PDA_SUITE" == pda-live-simulator* ]]; then
+  echo "  Devices:   none (read-only simulator transport)"
 else
   echo "  Devices:   suite-defined filter pump and optional heater"
 fi
@@ -281,6 +283,8 @@ if [ "$PDA_SUITE" = "pda-live-long" ] &&
   echo "  WARNING: this suite changes every discovered switch and heater settings"
 elif [ "$PDA_SUITE" = "pda-live-long" ]; then
   echo "  WARNING: this suite changes the restricted switches and heater settings"
+elif [[ "$PDA_SUITE" == pda-live-simulator* ]]; then
+  echo "  Access:    read-only AquaPDA simulator transport"
 else
   echo "  WARNING: this suite changes filter-pump and heater settings"
 fi
@@ -292,6 +296,12 @@ echo "  Config:    $SUT_CONFIG -> $CONTAINER_CONFIG"
 echo "  Timezone:  $PANEL_TIMEZONE"
 echo "  Web:       $SUT_WEB"
 echo "  Artifacts: $REMOTE_ARTIFACTS"
+
+if [[ "$PDA_SUITE" == pda-live-simulator* ]]; then
+  PANEL_ACCESS_ARG="--panel-read-only"
+else
+  PANEL_ACCESS_ARG="--panel-read-write"
+fi
 
 sudo docker run --rm \
   --name "$CONTAINER_NAME" \
@@ -306,7 +316,7 @@ sudo docker run --rm \
   --mount \
     "type=bind,source=$REMOTE_ARTIFACTS,target=$REMOTE_ARTIFACTS" \
   "$VALIDATOR_IMAGE" run \
-    --panel-read-write \
+    "$PANEL_ACCESS_ARG" \
     "${PDA_DEVICE_ARGS[@]}" \
     "${SOURCE_ARGS[@]}" \
     --label "$AQUALINKD_LABEL" \
