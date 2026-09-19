@@ -105,6 +105,22 @@
       },
 
       {
+        "label": "AqualinkD: make amd64",
+        "type": "process",
+        "command": "make",
+        "args": [
+          "-j",
+          "amd64"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:AqualinkD}"
+        },
+        "problemMatcher": [
+          "$gcc"
+        ]
+      },
+
+      {
         "label": "AqualinkD: make clean then arm64",
         "type": "shell",
         "command": "make clean && make -j arm64 CC_ARM64=\"aarch64-linux-gnu-gcc --sysroot=${env:HOME}/sysroots/pi-arm64\" LIBS=\"-L${env:HOME}/sysroots/pi-arm64/usr/lib/aarch64-linux-gnu -Wl,-rpath-link,${env:HOME}/sysroots/pi-arm64/usr/lib/aarch64-linux-gnu -lpthread -lm -lrt -lsystemd\"",
@@ -206,6 +222,106 @@
         "dependsOrder": "sequence",
         "dependsOn": [
           "AqualinkD: deploy arm64 to Pi /tmp"
+        ],
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated",
+          "clear": true
+        }
+      },
+
+      {
+        "label": "AqualinkD + Validator: pda-power-center-fast headless",
+        "type": "process",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-power-center.sh",
+        "args": [
+          "pda-power-center-fast",
+          "${workspaceFolder:AqualinkD}",
+          "${workspaceFolder:aqualinkd-validator}",
+          "${env:HOME}/.wine-aqualink"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:aqualinkd-validator}"
+        },
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "AqualinkD: make amd64"
+        ],
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated",
+          "clear": true
+        }
+      },
+
+      {
+        "label": "AqualinkD + Validator: pda-power-center-full headless",
+        "type": "process",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-power-center.sh",
+        "args": [
+          "pda-power-center-full",
+          "${workspaceFolder:AqualinkD}",
+          "${workspaceFolder:aqualinkd-validator}",
+          "${env:HOME}/.wine-aqualink"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:aqualinkd-validator}"
+        },
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "AqualinkD: make amd64"
+        ],
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated",
+          "clear": true
+        }
+      },
+
+      {
+        "label": "AqualinkD + Validator: rs-fast Power Center headless",
+        "type": "process",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-power-center.sh",
+        "args": [
+          "rs-fast",
+          "${workspaceFolder:AqualinkD}",
+          "${workspaceFolder:aqualinkd-validator}",
+          "${env:HOME}/.wine-aqualink"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:aqualinkd-validator}"
+        },
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "AqualinkD: make amd64"
+        ],
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated",
+          "clear": true
+        }
+      },
+
+      {
+        "label": "AqualinkD + Validator: rs-full Power Center headless",
+        "type": "process",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-power-center.sh",
+        "args": [
+          "rs-full",
+          "${workspaceFolder:AqualinkD}",
+          "${workspaceFolder:aqualinkd-validator}",
+          "${env:HOME}/.wine-aqualink"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder:aqualinkd-validator}"
+        },
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "AqualinkD: make amd64"
         ],
         "problemMatcher": [],
         "presentation": {
