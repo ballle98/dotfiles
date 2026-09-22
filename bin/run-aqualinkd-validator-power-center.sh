@@ -19,10 +19,7 @@ COM_LINK="$WINE_PREFIX/dosdevices/com3"
 ARTIFACTS="$VALIDATOR_DIR/artifacts"
 
 case "$SUITE" in
-  pda-power-center-fast|pda-power-center-full)
-    POWER_CENTER_MODEL="E260808 (PD 8 Combo)"
-    ;;
-  rs-fast|rs-full)
+  pda-power-center-fast|pda-power-center-full|rs-fast|rs-full)
     POWER_CENTER_MODEL="B29231 (16 Combo)"
     ;;
   *)
