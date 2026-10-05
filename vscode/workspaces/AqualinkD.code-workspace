@@ -24,7 +24,7 @@
     // C/C++ IntelliSense settings for Raspberry Pi OS arm64 target
     // ------------------------------------------------------------
     //
-    // These settings affect VS Code IntelliSense only.
+    // These settings affect IntelliSense only.
     // The actual build is controlled by the tasks below.
 
     "C_Cpp.default.compilerPath": "/usr/bin/aarch64-linux-gnu-gcc",
@@ -56,10 +56,12 @@
     "C_Cpp.default.cStandard": "gnu17",
     "C_Cpp.default.cppStandard": "gnu++17",
 
-    // Optional but helpful when switching configs or after sysroot updates.
+    // Optional but helpful when switching configurations or
+    // after updating the target sysroot.
     "C_Cpp.errorSquiggles": "enabled",
 
-    // pi-tmp is an rclone FUSE mount and does not support inotify watches.
+    // pi-tmp is an rclone FUSE mount and does not support
+    // normal inotify file-system watches.
     "files.watcherExclude": {
       "/home/lee_ballard/mnt/pi-tmp": true,
       "/home/lee_ballard/mnt/pi-tmp/**": true
@@ -71,12 +73,13 @@
     "tasks": [
       {
         "label": "AqualinkD: make arm64",
-        "type": "process",
+        "type": "shell",
         "command": "make",
         "args": [
           "-j",
+          "--output-sync=target",
           "arm64",
-          "CC_ARM64=aarch64-linux-gnu-gcc --sysroot=${env:HOME}/sysroots/pi-arm64",
+          "CC_ARM64=aarch64-linux-gnu-gcc --sysroot=${env:HOME}/sysroots/pi-arm64 -fdiagnostics-color=never",
           "LIBS=-L${env:HOME}/sysroots/pi-arm64/usr/lib/aarch64-linux-gnu -Wl,-rpath-link,${env:HOME}/sysroots/pi-arm64/usr/lib/aarch64-linux-gnu -lpthread -lm -lrt -lsystemd"
         ],
         "options": {
@@ -86,9 +89,28 @@
           "kind": "build",
           "isDefault": true
         },
-        "problemMatcher": [
-          "$gcc"
-        ]
+        "presentation": {
+          "reveal": "always",
+          "revealProblems": "onProblem",
+          "panel": "dedicated",
+          "clear": true
+        },
+        "problemMatcher": {
+          "owner": "aqualinkd-gcc",
+          "source": "gcc",
+          "fileLocation": [
+            "relative",
+            "${workspaceFolder:AqualinkD}"
+          ],
+          "pattern": {
+            "regexp": "^(.*?):(\\d+):(\\d*):?\\s+(?:fatal\\s+)?(warning|error):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "severity": 4,
+            "message": 5
+          }
+        }
       },
 
       {
@@ -122,14 +144,12 @@
 
       {
         "label": "AqualinkD: make clean then arm64",
-        "type": "shell",
-        "command": "make clean && make -j arm64 CC_ARM64=\"aarch64-linux-gnu-gcc --sysroot=${env:HOME}/sysroots/pi-arm64\" LIBS=\"-L${env:HOME}/sysroots/pi-arm64/usr/lib/aarch64-linux-gnu -Wl,-rpath-link,${env:HOME}/sysroots/pi-arm64/usr/lib/aarch64-linux-gnu -lpthread -lm -lrt -lsystemd\"",
-        "options": {
-          "cwd": "${workspaceFolder:AqualinkD}"
-        },
-        "problemMatcher": [
-          "$gcc"
-        ]
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "AqualinkD: make clean",
+          "AqualinkD: make arm64"
+        ],
+        "problemMatcher": []
       },
 
       {
@@ -157,6 +177,7 @@
         "options": {
           "cwd": "${workspaceFolder:AqualinkD}"
         },
+        "dependsOrder": "sequence",
         "dependsOn": [
           "AqualinkD: make arm64"
         ],
@@ -173,6 +194,7 @@
         "options": {
           "cwd": "${workspaceFolder:AqualinkD}"
         },
+        "dependsOrder": "sequence",
         "dependsOn": [
           "AqualinkD: deploy arm64 to Pi /tmp"
         ],

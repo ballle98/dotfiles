@@ -25,6 +25,17 @@ No automated test suite or coverage threshold is configured. Run the syntax chec
 
 Recent history uses short, lowercase, imperative summaries, for example `add vscode workspace for AqualinkD`. Keep each commit focused and explain behavioral or environment assumptions in its body when needed. Pull requests should summarize affected scripts or workspaces, list validation performed, and identify required external paths, hosts, or tools. Include screenshots only when editor-visible workspace behavior changes.
 
+### Commit Attribution
+
+Every commit created with AI coding assistance must include both of these exact commit-message trailers:
+
+```text
+Assisted-by: <AI-Tool>:<Model>
+Signed-off-by: <Your-Name> <your-email@example.com>
+```
+
+Replace `<AI-Tool>:<Model>` with the specific tool and model used (e.g., `Codex:gpt-5`, `Claude:claude-3.5-sonnet`, `Devin:swe-1.6`). Replace `<Your-Name>` and `<your-email@example.com>` with your identity.
+
 ## Safety & Configuration
 
 Never embed secrets, private keys, or machine-specific credentials. Review commands using `rm -rf`, `--delete`, `sudo`, or SSH before running them. Back up `~/.ssh/config` and `known_hosts` before testing changes to `bin/tether`.
