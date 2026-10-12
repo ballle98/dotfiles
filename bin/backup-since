@@ -84,6 +84,7 @@ printf 'Cutoff:  %s\n' "$CUTOFF"
 printf 'Archive: %s\n' "$ARCHIVE"
 
 cd "$SOURCE_DIR"
+printf '\nScanning files modified after the cutoff...\n'
 find . \
   -type f \
   -newermt "$CUTOFF" \
@@ -91,11 +92,22 @@ find . \
   -print0 \
   > "$FILE_LIST"
 
+FILE_COUNT="$(tr -cd '\000' < "$FILE_LIST" | wc -c)"
+printf 'Selected files: %s\n' "$FILE_COUNT"
+printf 'Creating archive...\n'
+
+CHECKPOINT_ACTION='echo=Progress: %T'
+if [ -t 2 ]; then
+  CHECKPOINT_ACTION='ttyout=%c'
+fi
+
 tar \
   --create \
   --gzip \
   --file="$ARCHIVE" \
+  --checkpoint=1000 \
+  --checkpoint-action="$CHECKPOINT_ACTION" \
   --null \
   --files-from="$FILE_LIST"
 
-printf 'Created: %s\n' "$ARCHIVE"
+printf '\nCreated: %s\n' "$ARCHIVE"
