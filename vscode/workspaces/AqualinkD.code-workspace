@@ -169,7 +169,7 @@
       {
         "label": "AqualinkD: deploy arm64 to Pi /tmp",
         "type": "process",
-        "command": "${env:HOME}/git/dotfiles/bin/deploy-aqualinkd-pi.sh",
+        "command": "${env:HOME}/git/dotfiles/bin/deploy-aqualinkd-pi",
         "args": [
           "pi@pi",
           "${workspaceFolder:AqualinkD}"
@@ -187,7 +187,7 @@
       {
         "label": "AqualinkD: deploy & run debug on Pi",
         "type": "process",
-        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-debug-pi.sh",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-debug-pi",
         "args": [
           "pi@pi"
         ],
@@ -216,7 +216,7 @@
       {
         "label": "AqualinkD: sync Pi sysroot",
         "type": "process",
-        "command": "${env:HOME}/git/dotfiles/bin/sync-pi-sysroot.sh",
+        "command": "${env:HOME}/git/dotfiles/bin/sync-pi-sysroot",
         "args": [
           "pi@pi",
           "${env:HOME}/sysroots/pi-arm64"
@@ -230,7 +230,7 @@
       {
         "label": "AqualinkD + Validator: pda-live-fast on staged Pi",
         "type": "process",
-        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi.sh",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi",
         "args": [
           "pi@pi",
           "${workspaceFolder:AqualinkD}",
@@ -256,7 +256,7 @@
       {
         "label": "AqualinkD + Validator: pda-power-center-fast headless",
         "type": "process",
-        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-power-center.sh",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-power-center",
         "args": [
           "pda-power-center-fast",
           "${workspaceFolder:AqualinkD}",
@@ -281,7 +281,7 @@
       {
         "label": "AqualinkD + Validator: pda-power-center-full headless",
         "type": "process",
-        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-power-center.sh",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-power-center",
         "args": [
           "pda-power-center-full",
           "${workspaceFolder:AqualinkD}",
@@ -306,7 +306,7 @@
       {
         "label": "AqualinkD + Validator: rs-fast Power Center headless",
         "type": "process",
-        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-power-center.sh",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-power-center",
         "args": [
           "rs-fast",
           "${workspaceFolder:AqualinkD}",
@@ -331,7 +331,7 @@
       {
         "label": "AqualinkD + Validator: rs-full Power Center headless",
         "type": "process",
-        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-power-center.sh",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-power-center",
         "args": [
           "rs-full",
           "${workspaceFolder:AqualinkD}",
@@ -356,7 +356,7 @@
       {
         "label": "AqualinkD + Validator: pda-live-long on staged Pi",
         "type": "process",
-        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi.sh",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi",
         "args": [
           "pi@pi",
           "${workspaceFolder:AqualinkD}",
@@ -382,7 +382,7 @@
       {
         "label": "AqualinkD + Validator: pda-live-simulator on staged Pi",
         "type": "process",
-        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi.sh",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi",
         "args": [
           "pi@pi",
           "${workspaceFolder:AqualinkD}",
@@ -408,7 +408,7 @@
       {
         "label": "AqualinkD + Validator: PDA simulator menu walk on staged Pi",
         "type": "process",
-        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi.sh",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi",
         "args": [
           "pi@pi",
           "${workspaceFolder:AqualinkD}",
@@ -434,7 +434,7 @@
       {
         "label": "AqualinkD + Validator: pda-live-fast on installed Pi",
         "type": "process",
-        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi.sh",
+        "command": "${env:HOME}/git/dotfiles/bin/run-aqualinkd-validator-pi",
         "args": [
           "pi@pi",
           "${workspaceFolder:AqualinkD}",

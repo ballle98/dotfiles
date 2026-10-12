@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: restore-since.sh [OPTIONS] ARCHIVE DESTINATION
+Usage: restore-since [OPTIONS] ARCHIVE DESTINATION
 
 Extract ARCHIVE, preview an rsync restore into DESTINATION, and prompt before
 performing the restore. By default, files newer at the destination are kept.

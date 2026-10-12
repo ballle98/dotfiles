@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: archive-since.sh [-o OUTPUT_DIR] DIR SINCE
+Usage: backup-since [-o OUTPUT_DIR] DIR SINCE
 
 Create a gzip-compressed tar archive containing regular files in DIR that
 were modified after SINCE. SINCE accepts any value understood by GNU date,

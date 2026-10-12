@@ -2,15 +2,15 @@
 
 ## Project Structure & Module Organization
 
-This repository stores personal command-line utilities and editor configuration rather than a single application. Executable tools live in `bin/`: `gnucash` launches the Flatpak application, `tether` detects an Android tether gateway and updates SSH files, and `sync-pi-sysroot.sh` builds a local Raspberry Pi ARM64 sysroot. VS Code multi-root workspaces and their build/deploy tasks live under `vscode/workspaces/`. Keep host- or project-specific automation beside similar files; do not commit generated sysroots, credentials, logs, or build output.
+This repository stores personal command-line utilities and editor configuration rather than a single application. Executable tools live in `bin/`: `gnucash` launches the Flatpak application, `tether` detects an Android tether gateway and updates SSH files, and `sync-pi-sysroot` builds a local Raspberry Pi ARM64 sysroot. VS Code multi-root workspaces and their build/deploy tasks live under `vscode/workspaces/`. Keep host- or project-specific automation beside similar files; do not commit generated sysroots, credentials, logs, or build output.
 
 ## Build, Test, and Development Commands
 
 There is no repository-wide build system. Use lightweight checks from the repository root:
 
-- `bash -n bin/gnucash bin/sync-pi-sysroot.sh` checks shell syntax without executing remote or destructive operations.
+- `bash -n bin/gnucash bin/sync-pi-sysroot` checks shell syntax without executing remote or destructive operations.
 - `python3 -m py_compile bin/tether` checks Python syntax (remove any generated `bin/__pycache__/` before committing).
-- `bin/sync-pi-sysroot.sh pi@pi ~/sysroots/pi-arm64` refreshes a Pi sysroot; it requires SSH and `rsync` and recreates the destination.
+- `bin/sync-pi-sysroot pi@pi ~/sysroots/pi-arm64` refreshes a Pi sysroot; it requires SSH and `rsync` and recreates the destination.
 - Open a file in `vscode/workspaces/` with VS Code to run its named Maven or Make tasks against adjacent project checkouts.
 
 ## Coding Style & Naming Conventions
