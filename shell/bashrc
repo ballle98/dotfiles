@@ -1,0 +1,52 @@
+# ~/.bashrc - interactive bash configuration.
+#
+# Managed in ~/git/dotfiles/shell/bashrc and symlinked to ~/.bashrc; edit it in
+# the repo, not in $HOME. Machine-specific or secret settings belong in
+# shell/bashrc.d/99-local.sh (untracked), never in a tracked fragment.
+
+# If not running interactively, don't do anything.
+case $- in
+  *i*) ;;
+    *) return;;
+esac
+
+# Find the dotfiles checkout even when it does not live at ~/git/dotfiles.
+# The ~/.bashrc symlink points at shell/bashrc inside the repo, so resolving it
+# makes the location self-configuring; fall back to the conventional path when
+# ~/.bashrc is a regular file.
+if [ -z "${DOTFILES_DIR:-}" ]; then
+  _dotfiles_rc="$(readlink -f "$HOME/.bashrc" 2>/dev/null || true)"
+  if [ -n "$_dotfiles_rc" ] && [ "$_dotfiles_rc" != "$HOME/.bashrc" ]; then
+    DOTFILES_DIR="$(dirname "$(dirname "$_dotfiles_rc")")"
+  else
+    DOTFILES_DIR="$HOME/git/dotfiles"
+  fi
+  unset _dotfiles_rc
+fi
+export DOTFILES_DIR
+
+# Distro defaults: command-not-found and other /etc hooks.
+[ -r /etc/bash.bashrc ] && . /etc/bash.bashrc
+
+# Programmable completion. Ubuntu ships this block commented out in
+# /etc/bash.bashrc, so non-login interactive shells only get it from here. The
+# library guards itself against double loading.
+if ! shopt -oq posix; then
+  if [ -r /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -r /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# Load the tracked fragments in filename order. 99-local.sh, if present, runs
+# last so it can override anything above it.
+if [ -d "$DOTFILES_DIR/shell/bashrc.d" ]; then
+  for _dotfiles_fragment in "$DOTFILES_DIR"/shell/bashrc.d/*.sh; do
+    [ -r "$_dotfiles_fragment" ] && . "$_dotfiles_fragment"
+  done
+  unset _dotfiles_fragment
+fi

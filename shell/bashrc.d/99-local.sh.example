@@ -1,0 +1,15 @@
+# Machine-specific or secret shell settings.
+#
+# Copy this file to 99-local.sh in the same directory and edit the copy:
+#
+#   cp "$DOTFILES_DIR/shell/bashrc.d/99-local.sh.example" \
+#      "$DOTFILES_DIR/shell/bashrc.d/99-local.sh"
+#
+# 99-local.sh is gitignored and loads last, so anything set here overrides the
+# tracked fragments. Never put tokens or hostnames in a tracked fragment.
+#
+# Personal aliases also belong here; the old ~/.bash_aliases hook is no longer
+# sourced.
+#
+# alias gs='git status --short'
+# export SOME_API_TOKEN="..."

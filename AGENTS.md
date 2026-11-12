@@ -1,41 +1,81 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
+Personal dotfiles, not an application: no build system, no CI, no tests. `README.md`
+covers layout and the shell install; the rest of the durable context is under `agents/`.
 
-This repository stores personal command-line utilities and editor configuration rather than a single application. Executable tools live in `bin/`: `gnucash` launches the Flatpak application, `tether` detects an Android tether gateway and updates SSH files, and `sync-pi-sysroot` builds a local Raspberry Pi ARM64 sysroot. VS Code multi-root workspaces and their build/deploy tasks live under `vscode/workspaces/`. Keep host- or project-specific automation beside similar files; do not commit generated sysroots, credentials, logs, or build output.
+## Layout
+- `bin/` - standalone bash/python tools. Most operate on sibling checkouts under `~/git/`
+  and a Pi reachable as `pi@pi`; nothing here builds the repo.
+- `shell/bashrc` - the real interactive bash config, symlinked to `~/.bashrc`; it
+  resolves `$DOTFILES_DIR` from that symlink so the checkout can live anywhere. Tracked
+  customizations are ordered fragments in `shell/bashrc.d/` (`10-`…`70-`). Host-specific
+  or secret settings go in gitignored `99-local.sh`, copied from `99-local.sh.example`;
+  never put them in a tracked fragment.
+- `vscode/workspaces/*.code-workspace` - JSONC: comments **and trailing commas**, so
+  `json.loads` fails. They reference outside repos by relative path (`../../../AqualinkD`),
+  so they only resolve when those checkouts are siblings under `~/git/`.
+- `agents/<workspace>/AGENTS.md` + `agents/<workspace>/handoffs/` - durable environment
+  context and dated handoffs (`YYYY-MM-DD-HHMM-<topic>.md`). Read the matching one first;
+  archive or delete a handoff once folded into `AGENTS.md`. `agents/` is only partly
+  tracked (handoff files and workspace `AGENTS.md` yes, README indexes and `.opencode/`
+  no) - do not `git add -A` it by accident.
+- `systemd/user/rclone-pi-tmp.service` - user unit (not installed on this host;
+  `~/mnt/pi-tmp` does not exist) that mounts `pi:/tmp`. `AqualinkD.code-workspace` still
+  lists that missing path as a root folder.
+- `docx2md` / `pptx2md` need `pandoc` (pptx also goes through LibreOffice), write the
+  `.md` next to the input, and drop extracted media into `./images`.
 
-## Build, Test, and Development Commands
+## Verification (there is no test suite)
+- `bash -n` the bash tools in `bin/`: `backup-since`, `deploy-aqualinkd-pi`, `docx2md`,
+  `gnucash`, `pptx2md`, `restore-since`, `run-aqualinkd-*`, `sync-pi-sysroot`.
+- `bash -n shell/bashrc shell/bashrc.d/*.sh`
+- `python3 -m py_compile bin/tether` then remove `bin/__pycache__/`
+- Everything else is manual and hits real hardware, a remote host, or a Wine prefix -
+  confirm the target before running anything.
 
-There is no repository-wide build system. Use lightweight checks from the repository root:
+## Scripts that leave this machine
+Positional arguments are a public interface: the workspace tasks call these scripts in
+exactly this order, so never reorder or rename parameters.
 
-- `bash -n bin/gnucash bin/sync-pi-sysroot` checks shell syntax without executing remote or destructive operations.
-- `python3 -m py_compile bin/tether` checks Python syntax (remove any generated `bin/__pycache__/` before committing).
-- `bin/sync-pi-sysroot pi@pi ~/sysroots/pi-arm64` refreshes a Pi sysroot; it requires SSH and `rsync` and recreates the destination.
-- Open a file in `vscode/workspaces/` with VS Code to run its named Maven or Make tasks against adjacent project checkouts.
+- `deploy-aqualinkd-pi [pi@host] [project_dir]` - copies `release/aqualinkd-arm64`,
+  `release/aqualinkd.conf`, and `web/` to `/tmp/aqualinkd`, `/tmp/aqualinkd.conf`,
+  `/tmp/aqualinkd-web`. Requires an arm64 build first.
+- `run-aqualinkd-debug-pi [pi@host]` - runs the already-staged
+  `/tmp/aqualinkd -d -v -c /tmp/aqualinkd.conf`; exits 2 if that process is running.
+  Deploy first; it uploads nothing itself.
+- `run-aqualinkd-validator-pi [pi@host] [aqualinkd_dir] [validator_dir] [suite] [devices] [profile]`
+  - rsyncs the validator to the Pi, `sudo docker build` there, runs live suites
+  (default `pda-live-fast`); needs ssh, rsync, docker.
+- `run-aqualinkd-validator-power-center [suite] [aqualinkd_dir] [validator_dir] [wine_prefix]`
+  - local Wine run; needs `wine`, `socat`, passwordless `sudo -n`,
+  `contrib/power-center-helper/build/pwrcntr-control.exe`, and the Jandy simulator
+  installed in `~/.wine-aqualink`. It re-links `com3` inside the prefix and `chown`s
+  `artifacts/`.
+- `sync-pi-sysroot [pi@host] [sysroot]` - recreates `~/sysroots/pi-arm64` using
+  `rsync -aH --delete`.
+- `tether` (python3, standard library only) - rewrites the `Host phone` block in
+  `~/.ssh/config` and prunes matching `known_hosts` entries.
 
-## Coding Style & Naming Conventions
+## Workspace tasks
+- `AqualinkD.code-workspace` chains tasks with `dependsOn` + `dependsOrder: sequence`
+  (e.g. `make amd64` before any power-center suite). `make arm64` needs the synced
+  sysroot and passes explicit `CC_ARM64`/`LIBS`.
+- When editing a script, grep the workspace file for its name: tasks pass the same
+  positional args and break silently if the order changes.
 
-For Bash, use an explicit shebang, two-space indentation, quoted expansions, and `set -euo pipefail` for substantial scripts. Use uppercase names for constants and environment-derived settings. Python uses four spaces, `snake_case` functions and variables, and standard-library modules where practical. Preserve executable permissions on files in `bin/`. Workspace files are JSON with comments; retain the existing indentation style of the file being edited and use descriptive task labels such as `AqualinkD: make arm64`.
+## Style
+- Bash: shebang, two-space indent, quoted expansions, `set -euo pipefail` on every
+  multi-step script (`docx2md` and `pptx2md` are the exceptions; `tether` is Python).
+  Keep `bin/` files executable.
+- Python: four spaces, `snake_case`, standard library only.
 
-## Testing Guidelines
+## Commits
+- Lowercase imperative subject; body explains behavior or environment assumptions.
+- Required trailers:
+  `Assisted-by: <Tool>:<Model>` and `Signed-off-by: <Name> <email>`
 
-No automated test suite or coverage threshold is configured. Run the syntax checks above and manually exercise only the platform-specific path you changed. For remote tasks, first verify the target host, destination, and prerequisites. Describe manual validation in the pull request, especially for SSH configuration changes, sysroot synchronization, deployment, or service control.
-
-## Commit & Pull Request Guidelines
-
-Recent history uses short, lowercase, imperative summaries, for example `add vscode workspace for AqualinkD`. Keep each commit focused and explain behavioral or environment assumptions in its body when needed. Pull requests should summarize affected scripts or workspaces, list validation performed, and identify required external paths, hosts, or tools. Include screenshots only when editor-visible workspace behavior changes.
-
-### Commit Attribution
-
-Every commit created with AI coding assistance must include both of these exact commit-message trailers:
-
-```text
-Assisted-by: <AI-Tool>:<Model>
-Signed-off-by: <Your-Name> <your-email@example.com>
-```
-
-Replace `<AI-Tool>:<Model>` with the specific tool and model used (e.g., `Codex:gpt-5`, `Claude:claude-3.5-sonnet`, `Devin:swe-1.6`). Replace `<Your-Name>` and `<your-email@example.com>` with your identity.
-
-## Safety & Configuration
-
-Never embed secrets, private keys, or machine-specific credentials. Review commands using `rm -rf`, `--delete`, `sudo`, or SSH before running them. Back up `~/.ssh/config` and `known_hosts` before testing changes to `bin/tether`.
+## Safety
+- No secrets, keys, or machine credentials in this repo.
+- Back up `~/.ssh/config` and `~/.ssh/known_hosts` before testing `tether`.
+- `rsync --delete`, `sudo`, `docker`, and `rm -rf` all appear in `bin/`; confirm host,
+  destination, and mount before executing.
