@@ -208,6 +208,12 @@ if [ -L "$COM_LINK" ]; then
 fi
 ln -s "$PANEL_TTY" "$COM_LINK"
 
+# `wine reg add` above can leave a wineserver that is already winding down.
+# A managed session started against it loses the emulator windows mid-startup
+# (Wine exits 1 with "X Error ... BadWindow ... X_UnmapWindow"), so end it and
+# let the session create its own.
+env WINEPREFIX="$WINE_PREFIX" wineserver -k 2>/dev/null || true
+
 echo "Running $SUITE with $POWER_CENTER_MODEL"
 echo "  Power Center: $PANEL_TTY (Wine COM3)"
 echo "  AqualinkD:    $AQUALINKD_TTY"
