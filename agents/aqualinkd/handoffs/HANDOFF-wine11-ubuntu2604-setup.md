@@ -40,9 +40,9 @@ Verified 2026-11-13:
 
 1. PR `ballle98/aqualinkd-validator#23` is still open (WoW64 path probe); merge when
    reviewed.
-2. Decide whether to rebase and push dotfiles: the local branch has unpushed commits and
-   is behind `origin/main`.
-3. Decide whether to track `agents/aqualinkd/AGENTS.md` (currently untracked).
+
+The dotfiles context is rebased onto `origin/main` and pushed; `agents/aqualinkd/AGENTS.md`
+is now tracked and the Wine handoff is renamed.
 
 ## Superseded assumptions (do not reuse)
 
