@@ -16,6 +16,9 @@
     },
     {
       "path": "../../../aqualinkd-validator.wiki"
+    },
+    {
+      "path": "../../agents/aqualinkd"
     }
   ],
 
