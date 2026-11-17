@@ -7,6 +7,9 @@
 		{
 			"name": "distro-app",
 			"path": "../../../openhab-distro/launch/app"
+		},
+		{
+			"path": "../../agents/org.openhab.binding.ddwrt"
 		}
 	],
 	"settings": {
